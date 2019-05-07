@@ -15,7 +15,8 @@
     dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_global_queue(0, 0));
 
     session.outputFileType = AVFileTypeQuickTimeMovie;
-    session.outputURL = [NSURL fileURLWithPath:[self createTempFileWithFormat:@"mp4"]];
+    NSString *filePath = [self createTempFileWithFormat:@"mp4"];
+    session.outputURL = [NSURL fileURLWithPath:filePath];
     session.shouldOptimizeForNetworkUse = YES;
     
     [session exportAsynchronouslyWithCompletionHandler:^{
@@ -43,7 +44,7 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             dispatch_source_cancel(timer);
             if (completion) {
-                completion(session.status, .0f, session.outputURL.absoluteString, [LLAssetExportManager firstTimeOfThumbnailWithUrl:session.outputURL]);
+                completion(session.status, .0f, filePath, [LLAssetExportManager firstTimeOfThumbnailWithUrl:session.outputURL]);
             }
         });
     }];
@@ -51,7 +52,7 @@
     dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, 100 * NSEC_PER_MSEC, 0 * NSEC_PER_SEC);
     dispatch_source_set_event_handler(timer, ^{
         if (completion) {
-            completion(AVAssetExportSessionStatusExporting, session.progress, session.outputURL.absoluteString, NULL);
+            completion(AVAssetExportSessionStatusExporting, session.progress, filePath, NULL);
         }
     });
     dispatch_resume(timer);

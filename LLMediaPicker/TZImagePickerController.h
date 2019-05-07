@@ -261,6 +261,9 @@
 - (void)imagePickerController:(TZImagePickerController *)picker didFinishPickingPhotos:(NSArray<UIImage *> *)photos sourceAssets:(NSArray *)assets isSelectOriginalPhoto:(BOOL)isSelectOriginalPhoto infos:(NSArray<NSDictionary *> *)infos;
 - (void)tz_imagePickerControllerDidCancel:(TZImagePickerController *)picker;
 
+
+- (void)startWithExportMedia;
+- (void)finishedWithExportMediaOfStatus:(NSInteger)status progress:(float)progress;
 - (void)imagePickerController:(TZImagePickerController *)picker didSelectVideoOfPath:(NSString *)filePath thumbImage:(UIImage *)image;
 
 // If user picking a video and allowPickingMultipleVideo is NO, this callback will be called.

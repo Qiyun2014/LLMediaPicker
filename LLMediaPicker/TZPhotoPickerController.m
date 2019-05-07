@@ -608,20 +608,34 @@ static CGFloat itemMargin = 5;
                 //self.editorModel = model;
                 //[self presentToVideoEditorControllerWithAsset:model.asset];
                 
+                if ([tzImagePickerVc.pickerDelegate respondsToSelector:@selector(startWithExportMedia)]) {
+                    [tzImagePickerVc.pickerDelegate startWithExportMedia];
+                }
+                
                 [LLAssetExportManager exportSessionWithPHAsset:model.asset completion:^(int status, float progress, NSString * _Nonnull output, UIImage * _Nullable thumbImage) {
                     NSLog(@"export session progress is  >>>>   %.3f", progress);
-                    if (status == AVAssetExportSessionStatusCompleted) {
-                        NSLog(@"~~~~~~~~~~~~   output = %@", output);
-                        
-                        if (tzImagePickerVc.didSelectVideoHandle) {
-                            tzImagePickerVc.didSelectVideoHandle(thumbImage, output);
-                        }
-                        
-                        [self.navigationController dismissViewControllerAnimated:YES completion:^{
-                            if ([tzImagePickerVc.pickerDelegate respondsToSelector:@selector(imagePickerController:didSelectVideoOfPath:thumbImage:)]) {
-                                [tzImagePickerVc.pickerDelegate imagePickerController:tzImagePickerVc didSelectVideoOfPath:output thumbImage:thumbImage];
+                    
+                    if ([tzImagePickerVc.pickerDelegate respondsToSelector:@selector(finishedWithExportMediaOfStatus:progress:)]) {
+                        [tzImagePickerVc.pickerDelegate finishedWithExportMediaOfStatus:status progress:progress];
+                    }
+                    
+                    switch (status) {
+                        case AVAssetExportSessionStatusCompleted:
+                        {
+                            if (tzImagePickerVc.didSelectVideoHandle) {
+                                tzImagePickerVc.didSelectVideoHandle(thumbImage, output);
                             }
-                        }];
+                            
+                            [self.navigationController dismissViewControllerAnimated:YES completion:^{
+                                if ([tzImagePickerVc.pickerDelegate respondsToSelector:@selector(imagePickerController:didSelectVideoOfPath:thumbImage:)]) {
+                                    [tzImagePickerVc.pickerDelegate imagePickerController:tzImagePickerVc didSelectVideoOfPath:output thumbImage:thumbImage];
+                                }
+                            }];
+                        }
+                            break;
+                            
+                        default:
+                            break;
                     }
                 }];
             }
